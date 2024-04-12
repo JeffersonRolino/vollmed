@@ -35,4 +35,11 @@ public class MedicoController {
         Optional<Medico> medicoSelecionado = repository.findById(dados.id());
         medicoSelecionado.ifPresent(medico -> medico.atualizarInformacoes(dados));
     }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public void excluir(@PathVariable Long id){
+        repository.deleteById(id);
+    }
+
 }
