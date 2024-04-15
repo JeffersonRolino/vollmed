@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,22 +26,30 @@ public class MedicoController {
     }
 
     @GetMapping
-    public Page<DadosListagemMedico> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao){
-        return repository.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
+    public ResponseEntity<Page<DadosListagemMedico>> listar(@PageableDefault(sort = {"nome"}) Pageable paginacao){
+        var page = repository.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
+        return ResponseEntity.ok(page);
     }
 
     @PutMapping
     @Transactional
-    public void atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados){
+    public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados){
         Optional<Medico> medicoSelecionado = repository.findById(dados.id());
-        medicoSelecionado.ifPresent(medico -> medico.atualizarInformacoes(dados));
+        if(medicoSelecionado.isPresent()){
+            medicoSelecionado.get().atualizarInformacoes(dados);
+            return ResponseEntity.ok(new DadosDetalhamentoMedico(medicoSelecionado.get()));
+        }
+        else {
+            return ResponseEntity.noContent().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public void excluir(@PathVariable Long id){
+    public ResponseEntity excluir(@PathVariable Long id){
         Optional<Medico> medicoSelecionado = repository.findById(id);
         medicoSelecionado.ifPresent(medico -> medico.excluir());
-    }
 
+        return ResponseEntity.noContent().build();
+    }
 }
