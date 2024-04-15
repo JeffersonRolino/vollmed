@@ -45,7 +45,7 @@ public class MedicoController {
             return ResponseEntity.ok(new DadosDetalhamentoMedico(medicoSelecionado.get()));
         }
         else {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -56,5 +56,16 @@ public class MedicoController {
         medicoSelecionado.ifPresent(medico -> medico.excluir());
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity detalhar(@PathVariable Long id){
+        Optional<Medico> medicoSelecionado = repository.findById(id);
+        if(medicoSelecionado.isPresent()){
+            return ResponseEntity.ok(new DadosDetalhamentoMedico(medicoSelecionado.get()));
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
