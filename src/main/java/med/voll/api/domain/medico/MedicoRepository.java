@@ -27,4 +27,6 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
             limit 1
             """)
     Medico escolherMedicoAleatorioLivreNaData(Especialidade especialidade, LocalDateTime data);
+
+    boolean findAtivoById(Long idMedico);
 }
